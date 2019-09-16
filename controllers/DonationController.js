@@ -1,14 +1,45 @@
-const Donation = require("../models/Donation.js");
-const donation = new Donation();
+/**
+ * Variable to access the donation entity repository
+ * 
+ * @type {object} donationRepository
+ */
+const donationRepository = require("../repositories/donation/DonationRepository.js");
 
+/**
+ * Render error page
+ * 
+ * @param  {object} req
+ * 
+ * @param  {object} res
+ * 
+ * @return void
+ */
 exports.renderErrorPage = (req, res) => {
 	res.render("Error");
 }
 
+/**
+ * 
+ * 
+ * @param  {object} req
+ * 
+ * @param  {object} res
+ * 
+ * @return void
+ */
 exports.renderDonatePage = (req, res) => {
 	res.render("DonatePage");
 }
 
+/**
+ * Render form page
+ * 
+ * @param  {object} req
+ * 
+ * @param  {object} res
+ * 
+ * @return void
+ */
 exports.renderDashboardPage = (req, res) => {
 	let perPage = 10;
 	let page = req.params.page || 1;
@@ -16,13 +47,13 @@ exports.renderDashboardPage = (req, res) => {
 	if(page < 1) {
 		res.render("Error");
 	} else {
-		donation.getNumOfPages(perPage).then(pages => {
-			donation.getMaxAmount().then(maxAmount => {
-				donation.getAmountForThisMonth().then(amountForThisMonth => {
-					donation.getTopDonator(maxAmount).then(topDonator => {
-						donation.sumAmount().then(amount => {
-							donation.getInformationForChart().then(dataForChart => {
-								donation.selectDataForPage(perPage, page).then(donations => {
+		donationRepository.getPageCount(perPage).then(pages => {
+			donationRepository.getMaxAmount().then(maxAmount => {
+				donationRepository.getAmountForThisMonth().then(amountForThisMonth => {
+					donationRepository.getTopDonator(maxAmount).then(topDonator => {
+						donationRepository.sumAmount().then(amount => {
+							donationRepository.getChartInfo().then(dataForChart => {
+								donationRepository.read(perPage, page).then(donations => {
 									let currentPage = Number(req.params.page);
 									if(isNaN(currentPage) || currentPage > pages) {
 										res.render("Error");
@@ -48,6 +79,15 @@ exports.renderDashboardPage = (req, res) => {
 	}
 }
 
+/**
+ * Enter data from the form into the database and redirect to the main page
+ * 
+ * @param  {object} req
+ * 
+ * @param  {object} res
+ * 
+ * @return void
+ */
 exports.receivingDonationData = (req, res) => {
 
 	const donationInfo = [
@@ -60,10 +100,19 @@ exports.receivingDonationData = (req, res) => {
 		},
 	];
 
-	donation.insertData(donationInfo);
+	donationRepository.create(donationInfo);
 	res.redirect("/page=1");
 }
 
+/**
+ * Redirect to home page
+ * 
+ * @param  {object} req
+ * 
+ * @param  {object} res
+ * 
+ * @return void
+ */
 exports.redirectToFirstPage = (req, res) => {
 	res.redirect("/page=1");
 }

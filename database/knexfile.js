@@ -2,6 +2,11 @@ require('dotenv').config({
   path: '../.env',
 });
 
+/**
+ * Object for knex.js configuration
+ * 
+ * @type {Object}
+ */
 module.exports = {
   development: {
     client: 'mysql',

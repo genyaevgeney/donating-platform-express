@@ -1,3 +1,10 @@
+/**
+ * Create database table
+ * 
+ * @param  {object} knex
+ * 
+ * @return void
+ */
 exports.up = async function up(knex) {
 	await knex.schema.createTable('donations', table => {
 		table
@@ -13,6 +20,13 @@ exports.up = async function up(knex) {
 	});
 };
 
+/**
+ * Delete database table
+ * 
+ * @param  {object} knex
+ * 
+ * @return void
+ */
 exports.down = async function down(knex) {
 	await knex.schema.dropTable('donations');
 };
